@@ -20,6 +20,10 @@ export const SUPPORTED_FILE_TYPES = [
   "image/gif",
   "image/webp",
   "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+  "application/msword", // .doc
+  "text/markdown", // .md
+  "text/plain", // .txt
 ];
 // FIXME  Mi80OmFIVnBZMlhtbTc3bHY1Zm9pYTg2ZVdKTFpnPT06NGU1ZjM3MTA=
 
@@ -37,20 +41,22 @@ export function useFileUpload({
   const dragCounter = useRef(0);
 
   const isDuplicate = (file: File, blocks: ContentBlock.Multimodal.Data[]) => {
-    if (file.type === "application/pdf") {
-      return blocks.some(
-        (b) =>
-          b.type === "file" &&
-          b.mimeType === "application/pdf" &&
-          b.metadata?.filename === file.name,
-      );
-    }
-    if (SUPPORTED_FILE_TYPES.includes(file.type)) {
+    // 图片类型去重
+    if (file.type.startsWith("image/")) {
       return blocks.some(
         (b) =>
           b.type === "image" &&
           b.metadata?.name === file.name &&
           b.mimeType === file.type,
+      );
+    }
+    // 文档类型去重（PDF, DOCX, DOC, MD, TXT）
+    if (SUPPORTED_FILE_TYPES.includes(file.type)) {
+      return blocks.some(
+        (b) =>
+          b.type === "file" &&
+          b.mimeType === file.type &&
+          b.metadata?.filename === file.name,
       );
     }
     return false;

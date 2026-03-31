@@ -79,18 +79,24 @@ export function useChat({
       const pdfBlocks = contentBlocks?.filter((b) => b.type !== "image") ?? [];
 
       // Convert image blocks to image_url format required by Doubao/OpenAI-compatible APIs
-      const imageUrlBlocks = imageBlocks.map((b) => ({
-        type: "image_url" as const,
-        image_url: {
-          url: `data:${b.mimeType};base64,${b.data}`,
+      const imageUrlBlocks = imageBlocks.flatMap((b) => [
+        {
+          type: "text" as const,
+          text: `[图片附件: ${b.metadata?.name || "image"}]`,
         },
-      }));
+        {
+          type: "image_url" as const,
+          image_url: {
+            url: `data:${b.mimeType};base64,${b.data}`,
+          },
+        },
+      ]);
 
       const messageContent: Message["content"] =
         imageUrlBlocks.length > 0
           ? ([
               ...(content.trim().length > 0
-                ? [{ type: "text" as const, text: content }]
+                ? [{ type: "text" as const, text: content + "\n\n" }]
                 : []),
               ...imageUrlBlocks,
             ] as Message["content"])

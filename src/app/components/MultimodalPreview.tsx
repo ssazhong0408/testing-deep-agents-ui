@@ -63,10 +63,19 @@ export const MultimodalPreview: React.FC<MultimodalPreviewProps> = ({
     );
   }
 
-  // PDF block
-  if (block.type === "file" && block.mimeType === "application/pdf") {
+  // Document block (PDF, DOCX, DOC, MD, TXT)
+  if (block.type === "file" && typeof block.mimeType === "string") {
     const filename =
-      block.metadata?.filename || block.metadata?.name || "PDF file";
+      block.metadata?.filename || block.metadata?.name || "文档";
+    // 根据 MIME 类型显示不同标签
+    const mimeLabels: Record<string, string> = {
+      "application/pdf": "PDF",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "DOCX",
+      "application/msword": "DOC",
+      "text/markdown": "MD",
+      "text/plain": "TXT",
+    };
+    const label = mimeLabels[block.mimeType] || "文件";
     return (
       <div
         className={cn(
@@ -82,18 +91,23 @@ export const MultimodalPreview: React.FC<MultimodalPreviewProps> = ({
             )}
           />
         </div>
-        <span
-          className={cn("min-w-0 flex-1 text-sm break-all text-gray-800")}
-          style={{ wordBreak: "break-all", whiteSpace: "pre-wrap" }}
-        >
-          {String(filename)}
-        </span>
+        <div className="min-w-0 flex-1">
+          <span
+            className={cn("text-sm break-all text-gray-800")}
+            style={{ wordBreak: "break-all", whiteSpace: "pre-wrap" }}
+          >
+            {String(filename)}
+          </span>
+          <span className="ml-1.5 inline-block rounded bg-teal-100 px-1.5 py-0.5 text-[10px] font-medium text-teal-700">
+            {label}
+          </span>
+        </div>
         {removable && (
           <button
             type="button"
             className="ml-2 self-start rounded-full bg-gray-200 p-1 text-teal-700 hover:bg-gray-300"
             onClick={onRemove}
-            aria-label="Remove PDF"
+            aria-label="Remove file"
           >
             <XIcon className="h-4 w-4" />
           </button>

@@ -27,6 +27,7 @@ import {
 import { ThreadList } from "@/app/components/ThreadList";
 import { ChatProvider } from "@/providers/ChatProvider";
 import { ChatInterface } from "@/app/components/ChatInterface";
+import { ExcelExportPanel } from "@/app/components/ExcelExportPanel";
 
 interface HomePageInnerProps {
   config: StandaloneConfig;
@@ -125,7 +126,7 @@ function HomePageInner({
       <div className="flex h-screen flex-col">
         <header className="flex h-16 items-center justify-between border-b border-border px-6">
           <div className="flex items-center gap-4">
-            <h1 className="text-xl font-semibold">但问智能测试平台</h1>
+            <h1 className="text-xl font-semibold">智能测试平台</h1>
             {!sidebar && (
               <Button
                 variant="ghost"
@@ -156,6 +157,7 @@ function HomePageInner({
               <Settings className="mr-2 h-4 w-4" />
               设置
             </Button>
+            <ExcelExportPanel />
             <Button
               variant="outline"
               size="sm"

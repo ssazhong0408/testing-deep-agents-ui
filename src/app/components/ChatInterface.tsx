@@ -562,14 +562,14 @@ export const ChatInterface = React.memo<ChatInterfaceProps>(({ assistant }) => {
                   className="flex cursor-pointer items-center gap-2 text-muted-foreground hover:text-primary"
                 >
                   <Plus className="size-5" />
-                  <span className="text-sm">上传 PDF 或图片</span>
+                  <span className="text-sm">上传文档或图片</span>
                 </Label>
                 <input
                   id="file-input"
                   type="file"
                   onChange={handleFileUpload}
                   multiple
-                  accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+                  accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,.docx,.doc,.md,.txt"
                   className="hidden"
                 />
               </div>

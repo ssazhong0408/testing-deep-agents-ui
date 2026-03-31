@@ -12,7 +12,7 @@ import { ContentBlock } from "@langchain/core/messages";
 import { toast } from "sonner";
 // eslint-disable  MS80OmFIVnBZMlhtbTc3bHY1Zm9pYTg2VlVWVFV3PT06YTE4YWIzNjU=
 
-// Returns a Promise of a typed multimodal block for images or PDFs
+// Returns a Promise of a typed multimodal block for images or documents
 export async function fileToContentBlock(
   file: File,
 ): Promise<ContentBlock.Multimodal.Data> {
@@ -22,11 +22,18 @@ export async function fileToContentBlock(
     "image/gif",
     "image/webp",
   ];
-  const supportedFileTypes = [...supportedImageTypes, "application/pdf"];
+  const supportedDocTypes = [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/msword",
+    "text/markdown",
+    "text/plain",
+  ];
+  const supportedFileTypes = [...supportedImageTypes, ...supportedDocTypes];
 
   if (!supportedFileTypes.includes(file.type)) {
     toast.error(
-      `Unsupported file type: ${file.type}. Supported types are: ${supportedFileTypes.join(", ")}`,
+      `不支持的文件类型: ${file.type}。支持: 图片(JPEG/PNG/GIF/WEBP)、PDF、DOCX、DOC、MD、TXT`,
     );
     return Promise.reject(new Error(`Unsupported file type: ${file.type}`));
   }
@@ -42,10 +49,10 @@ export async function fileToContentBlock(
     };
   }
 
-  // PDF
+  // 文档类型 (PDF, DOCX, DOC, MD, TXT)
   return {
     type: "file",
-    mimeType: "application/pdf",
+    mimeType: file.type,
     data,
     metadata: { filename: file.name },
   };
@@ -72,15 +79,23 @@ export function isBase64ContentBlock(
 ): block is ContentBlock.Multimodal.Data {
   if (typeof block !== "object" || block === null || !("type" in block))
     return false;
-  // file type (legacy)
+  // file type (documents)
   if (
     (block as { type: unknown }).type === "file" &&
     "mimeType" in block &&
-    typeof (block as { mimeType?: unknown }).mimeType === "string" &&
-    ((block as { mimeType: string }).mimeType.startsWith("image/") ||
-      (block as { mimeType: string }).mimeType === "application/pdf")
+    typeof (block as { mimeType?: unknown }).mimeType === "string"
   ) {
-    return true;
+    const mime = (block as { mimeType: string }).mimeType;
+    if (
+      mime.startsWith("image/") ||
+      mime === "application/pdf" ||
+      mime === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+      mime === "application/msword" ||
+      mime === "text/markdown" ||
+      mime === "text/plain"
+    ) {
+      return true;
+    }
   }
   // image type (new)
   if (
